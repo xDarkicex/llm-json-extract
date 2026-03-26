@@ -1,11 +1,21 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Glob qw(bsd_glob);
+use File::Spec;
 use lib 't/lib';
-use TestCLI qw(run_cli);
+use TestCLI qw(run_cli fixtures_dir);
 
-for my $input_file (sort bsd_glob('tests/fixtures/*.in')) {
+my $fixtures_dir = fixtures_dir();
+my @input_files;
+if (-d $fixtures_dir) {
+    opendir(my $dh, $fixtures_dir) or die "opendir $fixtures_dir: $!";
+    @input_files = map { File::Spec->catfile($fixtures_dir, $_) }
+                   sort grep { /\.in\z/ } readdir($dh);
+    closedir $dh;
+}
+ok(@input_files, 'fixture inputs discovered');
+
+for my $input_file (@input_files) {
     (my $base = $input_file) =~ s/\.in$//;
 
     open my $in_fh, '<', $input_file or die "open $input_file: $!";
@@ -36,6 +46,7 @@ for my $input_file (sort bsd_glob('tests/fixtures/*.in')) {
     if (-f "$base.exit") {
         open my $exit_fh, '<', "$base.exit" or die "open $base.exit: $!";
         chomp($want_exit = <$exit_fh>);
+        $want_exit = int($want_exit);
         close $exit_fh;
     }
 

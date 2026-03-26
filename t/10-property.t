@@ -54,4 +54,60 @@ for my $i (1..80) {
     ok(defined $fobj, "fallback-empty never emits malformed JSON (iter $i)");
 }
 
+for my $i (1..120) {
+    my $target = {
+        req_id => "req_$i",
+        ok     => JSON::PP::true,
+        value  => int(rand(10_000)),
+    };
+    my $target_json = $json->encode($target);
+
+    my $decoy = {
+        noise => rand_word(5),
+        nums  => [ map { int rand 100 } 1..(3 + int rand 5) ],
+        deep  => { a => 1, b => [2, 3, 4] },
+    };
+    my $decoy_json = $json->encode($decoy);
+
+    my @prefix = (
+        "Sure, here is the requested payload:\n",
+        "I will return JSON only.\n",
+        "<answer>\n",
+        "```text\nanalysis omitted\n```\n",
+    );
+    my @joiner = (
+        "\nThanks!",
+        "\nAdditional commentary follows.",
+        "\n<notes>not json</notes>",
+        "\nFinal answer above.",
+    );
+    my @decoy_tail = (
+        '',
+        "\nIgnore this demo object: $decoy_json",
+        "\nExample template (not requested): $decoy_json",
+    );
+
+    my $input = $prefix[int rand @prefix]
+        . $target_json
+        . $joiner[int rand @joiner]
+        . $decoy_tail[int rand @decoy_tail];
+
+    my $res = run_cli(args => ['--no-largest'], stdin => $input);
+    is($res->{exit}, 0, "chatty contract exits 0 (iter $i)");
+    my $decoded = eval { decode_json($res->{stdout}) };
+    ok(defined $decoded, "chatty contract emits valid JSON only (iter $i)")
+        or diag($res->{stdout});
+
+    my $actual = defined $decoded ? $json->encode($decoded) : '';
+    is($actual, $target_json, "chatty contract returns requested payload exactly (iter $i)");
+    is($res->{stdout}, $target_json . "\n", "chatty contract stdout has no extra text (iter $i)");
+
+    my $meta = run_cli(args => ['--meta', '--no-largest'], stdin => $input);
+    is($meta->{exit}, 0, "chatty meta exits 0 (iter $i)");
+    my $env = eval { decode_json($meta->{stdout}) };
+    ok(defined $env && $env->{ok}, "chatty meta envelope is valid success (iter $i)");
+    my $meta_actual = (defined $env && $env->{ok}) ? $json->encode($env->{data}) : '';
+    is($meta_actual, $target_json, "chatty meta data matches requested payload (iter $i)");
+}
+
 done_testing;
