@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Build release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          OUT="dist"
+          PKG="llm-json-extract-${TAG}"
+
+          mkdir -p "${OUT}/${PKG}"
+          cp llm-json-extract.pl "${OUT}/${PKG}/"
+          cp README.md "${OUT}/${PKG}/"
+          cp LICENSE "${OUT}/${PKG}/"
+
+          tar -C "${OUT}" -czf "${OUT}/${PKG}.tar.gz" "${PKG}"
+
+          (
+            cd "${OUT}"
+            sha256sum "${PKG}.tar.gz" > SHA256SUMS
+            sha256sum "${PKG}/llm-json-extract.pl" >> SHA256SUMS
+            sha256sum "${PKG}/README.md" >> SHA256SUMS
+            sha256sum "${PKG}/LICENSE" >> SHA256SUMS
+          )
+
+      - name: Upload release artifact bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-${{ github.ref_name }}
+          path: dist/
+
+      - name: Generate provenance attestation
+        uses: actions/attest-build-provenance@92c65d2898f1f53cfdc910b962cecff86e7f8fcc # v1
+        with:
+          subject-path: |
+            dist/*.tar.gz
+            dist/SHA256SUMS
+
+      - name: Publish GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          gh release create "${TAG}" \
+            dist/*.tar.gz \
+            dist/SHA256SUMS \
+            --title "${TAG}" \
+            --notes "Automated release for ${TAG}. Includes artifact checksums and build provenance attestation."
