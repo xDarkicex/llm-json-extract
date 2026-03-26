@@ -11,6 +11,49 @@ brew tap zephyr-systems/llm-json-extract
 brew install llm-json-extract
 ```
 
+## Manual Install
+
+```bash
+git clone https://github.com/xDarkicex/llm-json-extract.git
+cd llm-json-extract
+chmod +x llm-json-extract.pl
+sudo install -m 0755 llm-json-extract.pl /usr/local/bin/llm-json-extract
+```
+
+Run after manual install:
+
+```bash
+llm-json-extract --version
+```
+
+## Usage Guide
+
+Most common flow:
+
+```bash
+<command that prints LLM output> | llm-json-extract | jq .
+```
+
+Reliable stdin paste flow (Linux/macOS, avoids shell quote issues):
+
+```bash
+llm-json-extract <<'EOF' | jq .
+PASTE LLM OUTPUT HERE
+EOF
+```
+
+From file:
+
+```bash
+llm-json-extract response.txt | jq .
+```
+
+Meta envelope mode (recommended for integrations):
+
+```bash
+llm-json-extract --meta --fallback-empty --timeout 2 response.txt | jq .
+```
+
 ## What Problem It Solves
 
 LLM responses often include preambles, markdown fences, XML-ish wrappers, comments, trailing commas, or truncation. This tool provides a bounded, production-oriented extraction path with explicit failure modes.
@@ -105,6 +148,15 @@ Repair/recover (best-effort):
 ```bash
 cat noisy.txt | perl llm-json-extract.pl --repair --recover --pretty
 ```
+
+Example files in this repo:
+- CLI pipeline helper: `examples/pipeline.sh`
+- Server wrappers overview: `examples/server/README.md`
+- Go `net/http` wrapper: `examples/server/nethttp/main.go`
+- Go Nanite wrapper: `examples/server/nanite/main.go`
+- Python wrapper: `examples/server/python/server.py`
+- Node wrapper: `examples/server/node/server.js`
+- TypeScript wrapper: `examples/server/ts/server.ts`
 
 ## Tests
 
