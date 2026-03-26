@@ -1,0 +1,54 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.code-workspace
+.history
+
+# Perl build / distribution artifacts
+/blib/
+/_build/
+/Build
+/Build.bat
+/_build_params
+/MYMETA.json
+/MYMETA.yml
+/Makefile
+/Makefile.old
+/pm_to_blib
+/inc/
+/local/
+/local-lib/
+/perl5/
+
+# Perl testing / coverage
+/cover_db/
+/nytprof.out
+nytprof.out
+*.gcov
+
+# Logs / temp
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+/tmp/
+/temp/
+
+# Archives / packaged releases
+*.tar.gz
+*.zip
+
+# Environment / secrets
+.env
+.env.*
