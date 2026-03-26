@@ -1,0 +1,15 @@
+{
+  "name": "llm-json-extract-example-ts",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx server.ts",
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

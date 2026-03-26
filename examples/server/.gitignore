@@ -1,0 +1,6 @@
+# Go build outputs from example modules
+nethttp/llm-json-extract-example-nethttp
+nanite/llm-json-extract-example-nanite
+
+# Python cache
+python/__pycache__/

@@ -1,0 +1,9 @@
+{
+  "name": "llm-json-extract-example-node",
+  "private": true,
+  "version": "0.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
