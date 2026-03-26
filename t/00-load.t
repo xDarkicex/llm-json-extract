@@ -5,7 +5,7 @@ use lib 't/lib';
 use TestCLI qw(run_cli script_path);
 
 ok(-f script_path(), 'script exists');
-my $syntax = qx(perl @{[script_path()]} -c 2>&1);
+my $syntax = qx(perl -c @{[script_path()]} 2>&1);
 is($? >> 8, 0, 'script compiles cleanly') or diag($syntax);
 
 my $ver = run_cli(args => ['--version']);

@@ -1,0 +1,13 @@
+[Unit]
+Description=Socket for LLM JSON Extract service
+
+[Socket]
+ListenStream=/run/llm-json-extract.sock
+SocketMode=0660
+SocketUser=llmjson
+SocketGroup=llmjson
+Accept=yes
+RemoveOnStop=true
+
+[Install]
+WantedBy=sockets.target

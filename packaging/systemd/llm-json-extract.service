@@ -1,0 +1,35 @@
+[Unit]
+Description=LLM JSON Extract (socket-activated, one request per process)
+Documentation=https://github.com/xDarkicex/llm-json-extract
+After=network.target
+
+[Service]
+Type=simple
+# systemd passes the accepted socket connection on stdin/stdout.
+ExecStart=/usr/bin/perl /opt/llm-json-extract/llm-json-extract.pl --meta --fallback-empty --max-size 10M --max-candidate 2M --max-repair-size 1M --timeout 2
+StandardInput=socket
+StandardOutput=socket
+StandardError=journal
+User=llmjson
+Group=llmjson
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+MemoryDenyWriteExecute=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+UMask=0077
+RuntimeMaxSec=30
+TimeoutStartSec=5
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target
