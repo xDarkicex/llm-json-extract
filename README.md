@@ -4,6 +4,13 @@ High-assurance JSON extraction for noisy LLM output.
 
 `llm-json-extract.pl` is a deterministic CLI filter that finds JSON inside wrappers, chatty text, or truncated model output and emits valid JSON for pipelines, APIs, and frontend backends.
 
+## Homebrew Install
+
+```bash
+brew tap zephyr-systems/llm-json-extract
+brew install llm-json-extract
+```
+
 ## What Problem It Solves
 
 LLM responses often include preambles, markdown fences, XML-ish wrappers, comments, trailing commas, or truncation. This tool provides a bounded, production-oriented extraction path with explicit failure modes.
